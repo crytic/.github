@@ -1,0 +1,45 @@
+on:
+  workflow_call:
+    inputs:
+      type:
+        description: "Use make or just to install project dependencies"
+        required: false
+        type: string
+      trunk-arguments:
+        description: Extra arguments to pass to trunk
+        required: false
+        type: string
+      trunk-check-mode:
+        description: "Trunk check mode. Leave unset to autodetect changes. Set to 'all' to check the entire repository."
+        required: false
+        type: string
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install just, if required
+        if: inputs.type == 'just'
+        uses: extractions/setup-just@69d82fb0233557aec017ef13706851d0694e0f1d #pin@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: install dependencies with make, if required
+        if: inputs.type == 'make'
+        run: make dev
+
+      - name: install dependencies with just, if required
+        if: inputs.type == 'just'
+        run: just dev
+
+      - name: trunk check
+        uses: trunk-io/trunk-action@4f077db8a20117a021b787adbf62729ae143c19e # pin@v1.0.8
+        with:
+          trunk-token: ${{ secrets.TRUNK_TOKEN }}
+          check-mode: ${{ inputs.trunk-check-mode }}
+          arguments: ${{ inputs.trunk-arguments }}
