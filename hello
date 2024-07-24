@@ -28,5 +28,3 @@
 > $ brew install --cask firefox
 > $ brew create --cask https://foo.com/foo-1.0.dmg
 > Editing /opt/homebrew/Library/Taps/homebrew/homebrew-cask/Casks/foo.rb
-> 
-> 
